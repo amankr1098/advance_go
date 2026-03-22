@@ -10,20 +10,20 @@ func TestCacheBasicOperations(t *testing.T) {
 
 	// Test Set and Get
 	cache.Set("foo", 42)
-	if val := cache.Get("foo"); val != 42 {
-		t.Errorf("expected 42, got %v", val)
+	if val, ok := cache.Get("foo"); !ok || val != 42 {
+		t.Errorf("expected 42, got %v, found: %v", val, ok)
 	}
 
 	// Test Overwrite
 	cache.Set("foo", 100)
-	if val := cache.Get("foo"); val != 100 {
-		t.Errorf("expected 100, got %v", val)
+	if val, ok := cache.Get("foo"); !ok || val != 100 {
+		t.Errorf("expected 100, got %v, found: %v", val, ok)
 	}
 
 	// Test Delete
 	cache.Delete("foo")
-	if val := cache.Get("foo"); val != 0 {
-		t.Errorf("expected 0 after delete, got %v", val)
+	if _, ok := cache.Get("foo"); ok {
+		t.Errorf("expected key to be deleted, but found")
 	}
 
 	// Test Keys
@@ -57,8 +57,8 @@ func TestCacheConcurrentAccess(t *testing.T) {
 	}
 	wg.Wait()
 	for i := 0; i < 100; i++ {
-		if val := cache.Get(i); val != i*i {
-			t.Errorf("expected %d, got %d", i*i, val)
+		if val, ok := cache.Get(i); !ok || val != i*i {
+			t.Errorf("expected %d, got %d, found: %v", i*i, val, ok)
 		}
 	}
 }
